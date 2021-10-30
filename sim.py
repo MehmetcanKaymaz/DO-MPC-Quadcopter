@@ -50,6 +50,8 @@ def template_simulator(model):
     p_num['Iyy'] = 1e-3
     p_num['Ixx'] = 1e-3
     p_num['Izz'] = 1e-3
+    p_num['g'] = 9.81
+    p_num['m'] = 0.5
     #p_num['Thetatarget'] = np.pi/4
 
     def p_fun(t_now):

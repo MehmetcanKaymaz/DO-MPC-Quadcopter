@@ -57,29 +57,37 @@ def template_mpc(model):
     lterm = model.aux['cost']
 
     mpc.set_objective(mterm=mterm, lterm=lterm)
-    mpc.set_rterm(inp=np.array([[0.5], [0.5], [0.5]]))
+    mpc.set_rterm(inp=np.array([[0.5], [0.5], [0.5],[1.5]]))
 
-    max_x = np.array([[np.pi/2], [np.pi/2], [np.pi/2]])
-    max_u = np.array([[0.5], [0.5], [0.5]])
+    max_att = np.array([[np.pi/3], [np.pi/3], [np.pi]])
+    max_rate = np.array([[np.pi], [np.pi], [np.pi]])
+    max_u = np.array([[0.5], [0.5], [0.5],[2*0.5*9.81]])
+    min_u = np.array([[0.5], [0.5], [0.5],[0.0]])
+    max_vel=np.array([[15], [15], [15]])
+
+    mpc.bounds['lower','_x','Velocity'] = -max_vel
+    mpc.bounds['upper','_x','Velocity'] = max_vel
 
     # lower and upper bounds of the states
-    mpc.bounds['lower','_x','angle'] = -max_x
-    mpc.bounds['upper','_x','angle'] = max_x
+    mpc.bounds['lower','_x','Attitude'] = -max_att
+    mpc.bounds['upper','_x','Attitude'] = max_att
      # lower and upper bounds of the states
-    mpc.bounds['lower','_x','D_angle'] = -max_x
-    mpc.bounds['upper','_x','D_angle'] = max_x   
+    mpc.bounds['lower','_x','Rate'] = -max_rate
+    mpc.bounds['upper','_x','Rate'] = max_rate  
 
     # lower bounds of the input
-    mpc.bounds['lower','_u','inp'] = -max_u
+    mpc.bounds['lower','_u','inp'] = -min_u
     # upper bounds of the input
     mpc.bounds['upper','_u','inp'] =  max_u
     
     Iyy_values = np.array([1e-3])
     Ixx_values = np.array([1e-3])
     Izz_values = np.array([1e-3])
+    m = np.array([0.5])
+    g = np.array([9.81])
     #target = np.array([np.pi/4])
 
-    mpc.set_uncertainty_values(Iyy=Iyy_values,Ixx=Ixx_values,Izz=Izz_values)
+    mpc.set_uncertainty_values(Iyy=Iyy_values,Ixx=Ixx_values,Izz=Izz_values,m=m,g=g)
 
     mpc.setup()
 

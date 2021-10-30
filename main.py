@@ -54,7 +54,7 @@ estimator = do_mpc.estimator.StateFeedback(model)
 """
 Set initial state
 """
-x0 = np.pi*np.array([0, 0, 0, 0, 0, 0,]).reshape(-1,1) # roll, pitch, yaw and its derivatives
+x0 = np.pi*np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).reshape(-1,1) # roll, pitch, yaw and its derivatives
 
 mpc.x0 = x0
 simulator.x0 = x0
@@ -68,24 +68,33 @@ Setup graphic:
 
 #color = plt.rcParams['axes.prop_cycle'].by_key()['color']
 rcParams['axes.grid'] = True
-fig, ax = plt.subplots(3,1, sharex=True, figsize=(10, 9))
+fig, ax = plt.subplots(5,1, sharex=True, figsize=(10, 9))
 mpc_plot = do_mpc.graphics.Graphics(mpc.data)
 
+ax[0].set_title('Pose:')
+ax[0].set_ylabel('Pose\n[m]')
+mpc_plot.add_line('_x', 'Pose', ax[0]) 
+ax[0].legend(['x', 'y', 'z'])
 
-ax[0].set_title('Rotation Angles:')
-ax[0].set_ylabel('angle\n[rad]')
-mpc_plot.add_line('_x', 'angle', ax[0]) 
-ax[0].legend(['Roll', 'Pitch', 'Yaw'])
+ax[1].set_title('Velocity:')
+ax[1].set_ylabel('Velocity\n[m/s]')
+mpc_plot.add_line('_x', 'Velocity', ax[1]) 
+ax[1].legend(['Vel_x', 'Vel_y', 'Vel_z'])
 
-ax[1].set_title('Angular Velocity:')
-ax[1].set_ylabel('angle velocity\n[rad/s2]')
-mpc_plot.add_line('_x', 'D_angle', ax[1])
-ax[1].legend(['Roll Rate', 'Pitch Rate', 'Yaw Rate'])
+ax[2].set_title('Rotation Angles:')
+ax[2].set_ylabel('angle\n[rad]')
+mpc_plot.add_line('_x', 'Attitude', ax[2]) 
+ax[2].legend(['Roll', 'Pitch', 'Yaw'])
 
-ax[2].set_title('Inputs')
-ax[2].set_ylabel('inputs')
-mpc_plot.add_line('_u', 'inp', ax[2])
-ax[2].legend(['input 1', 'input 2', 'input 3'])
+ax[3].set_title('Angular Velocity:')
+ax[3].set_ylabel('angle velocity\n[rad/s2]')
+mpc_plot.add_line('_x', 'Rate', ax[3])
+ax[3].legend(['Roll Rate', 'Pitch Rate', 'Yaw Rate'])
+
+ax[4].set_title('Inputs')
+ax[4].set_ylabel('inputs')
+mpc_plot.add_line('_u', 'inp', ax[4])
+ax[4].legend(['input 1', 'input 2', 'input 3','input 4'])
 
 
 fig.tight_layout()
@@ -97,7 +106,7 @@ plt.ion()
 Run MPC main loop:
 """
 
-for k in range(100):
+for k in range(300):
     u0 = mpc.make_step(x0)
     y_next = simulator.make_step(u0)
     x0 = estimator.make_step(y_next)

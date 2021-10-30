@@ -38,30 +38,80 @@ def template_model(symvar_type='SX'):
     model = do_mpc.model.Model(model_type, symvar_type)
 
     # States struct (optimization variables): roll, pitch, yaw
-    angle    = model.set_variable(var_type='_x', var_name='angle', shape=(3,1)) # roll, pitch and yaw 
-    D_angle  = model.set_variable(var_type='_x', var_name='D_angle', shape=(3,1)) # first derivation of roll, pitch and yaw angle
+    Pose= model.set_variable(var_type='_x', var_name='Pose', shape=(3,1))
+    Velocity= model.set_variable(var_type='_x', var_name='Velocity', shape=(3,1))
+    Attitude    = model.set_variable(var_type='_x', var_name='Attitude', shape=(3,1)) # roll, pitch and yaw 
+    Rate  = model.set_variable(var_type='_x', var_name='Rate', shape=(3,1)) # first derivation of roll, pitch and yaw angle
     #DD_angle = model.set_variable(var_type='_x', var_name='DD_angle', shape=(3,1)) # second derivation of roll, pitch and yaw angle
     
     # Input struct (optimization variables):
-    inp = model.set_variable(var_type='_u', var_name='inp', shape=(3,1)) # u1, u2, u3
+    inp = model.set_variable(var_type='_u', var_name='inp', shape=(4,1)) # u1, u2, u3
    
     # uncertain parameters:
     Ixx = model.set_variable('_p',  'Ixx')
     Iyy = model.set_variable('_p',  'Iyy')
     Izz = model.set_variable('_p',  'Izz')
+    g=model.set_variable('_p',  'g')
+    m=model.set_variable('_p',  'm')
 
-    DD_angle_next = vertcat( 
+    """
+    Velocity_dot=vertcat( 
+                            Velocity[1]*Rate[2]-Velocity[2]*Rate[1]+g*np.sin(Attitude[1]),  
+                            Velocity[2]*Rate[0]-Velocity[0]*Rate[2]+g*np.cos(Attitude[1])*np.sin(Attitude[0]), 
+                            Velocity[0]*Rate[1]-Velocity[1]*Rate[0]-g*np.cos(Attitude[1])*np.sin(Attitude[0])+inp[3]/m
+    )"""
+    Pose_dot=vertcat( 
+                            Velocity[0]*np.cos(Attitude[2])-Velocity[1]*np.sin(Attitude[2]),  
+                            Velocity[1]*np.cos(Attitude[2])+Velocity[0]*np.sin(Attitude[2]), 
+                            Velocity[2])
+    Velocity_dot=vertcat( 
+                            -inp[3]*(np.sin(Attitude[1]))/m,  
+                            inp[3]*(np.sin(Attitude[0]))/m, 
+                            -g+inp[3]*np.cos(Attitude[0])*np.cos(Attitude[1])/m
+    )
+    """
+    Velocity_dot=vertcat( 
+                            -inp[3]*(np.sin(Attitude[0])*np.sin(Attitude[2])+np.cos(Attitude[0])*np.cos(Attitude[2])*np.sin(Attitude[1]))/m,  
+                            -inp[3]*(np.cos(Attitude[0])*np.sin(Attitude[2])*np.sin(Attitude[1])-np.cos(Attitude[2])*np.sin(Attitude[1]))/m, 
+                            g-inp[3]*np.cos(Attitude[0])*np.cos(Attitude[1])/m
+    )"""
+    """
+    Rate_dot = vertcat( 
                             inp[0]/Ixx ,  
                             inp[1]/Iyy , 
                             inp[2]/Izz 
+    )
+    """ 
+    Rate_dot = vertcat( 
+                            (Iyy-Izz)*Rate[1]*Rate[2]/Ixx + inp[0]/Ixx ,  
+                            (Izz-Ixx)*Rate[0]*Rate[2]/Iyy + inp[1]/Iyy , 
+                            (Ixx-Iyy)*Rate[1]*Rate[0]/Izz + inp[2]/Izz 
     ) 
-
+    
+    Attitude_dot=vertcat(Rate[0]+Rate[2]*(np.cos(Attitude[0])*np.tan(Attitude[1]))+Rate[1]*(np.sin(Attitude[0])*np.tan(Attitude[1])),
+    Rate[1]*np.cos(Attitude[0])-Rate[2]*np.sin(Attitude[0]),
+    Rate[2]*np.cos(Attitude[0])/np.cos(Attitude[1])+Rate[1]*np.sin(Attitude[0])/np.cos(Attitude[1]))
+    """
+    Attitude_dot=vertcat(Rate[0],
+    Rate[1],
+    Rate[2]
+    )"""
     # Differential equations
-    model.set_rhs('angle', D_angle)
-    model.set_rhs('D_angle', DD_angle_next)
+    model.set_rhs('Pose', Pose_dot)
+    model.set_rhs('Attitude', Attitude_dot)
+    model.set_rhs('Rate', Rate_dot)
+    model.set_rhs('Velocity', Velocity_dot)
+
+    ref_pose=[5,5,5]
+    target_pose=np.array(ref_pose)
+
+    target_vel_body=[target_pose[0]-Pose[0],target_pose[1]-Pose[1],target_pose[2]-Pose[2]]
+
+    target_vel=[target_vel_body[0]*np.cos(Attitude[2])+target_vel_body[1]*np.sin(Attitude[2]),target_vel_body[1]*np.cos(Attitude[2])-target_vel_body[0]*np.sin(Attitude[2]),target_vel_body[2]]
+    
     
     # Cost
-    cost=pow(np.pi/4-angle[0],2)+pow(np.pi/8-angle[1],2)+pow(-np.pi/8-angle[2],2)
+    cost=.1*pow(3*target_vel[0]-Velocity[0],2)+.1*pow(3*target_vel[1]-Velocity[1],2)+.1*pow(3*target_vel[2]-Velocity[2],2)+5*pow(1*np.pi/2-Attitude[2],2)
 
     model.set_expression('cost', cost)
 
