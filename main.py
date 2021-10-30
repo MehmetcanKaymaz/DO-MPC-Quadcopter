@@ -22,13 +22,14 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 from casadi import *
 from casadi.tools import *
 import pdb
 import sys
 sys.path.append('../../')
 import do_mpc
-
+from matplotlib import rcParams
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import time
@@ -53,16 +54,7 @@ estimator = do_mpc.estimator.StateFeedback(model)
 """
 Set initial state
 """
-
-Theta_0 = 0.0 # This is the initial concentration inside the tank [mol/l]
-q_0 = 0.0 
-Roll_0=0.0
-p_0=0.0
-Yaw_0=0.0
-r_0=0.0
-
-x0 = np.array([Theta_0,q_0,Roll_0,p_0,Yaw_0,r_0])
-
+x0 = np.pi*np.array([0, 0, 0, 0, 0, 0,]).reshape(-1,1) # roll, pitch, yaw and its derivatives
 
 mpc.x0 = x0
 simulator.x0 = x0
@@ -74,26 +66,51 @@ mpc.set_initial_guess()
 Setup graphic:
 """
 
-fig, ax, graphics = do_mpc.graphics.default_plot(mpc.data, figsize=(8,5))
+#color = plt.rcParams['axes.prop_cycle'].by_key()['color']
+rcParams['axes.grid'] = True
+fig, ax = plt.subplots(3,1, sharex=True, figsize=(10, 9))
+mpc_plot = do_mpc.graphics.Graphics(mpc.data)
+
+
+ax[0].set_title('Rotation Angles:')
+ax[0].set_ylabel('angle\n[rad]')
+mpc_plot.add_line('_x', 'angle', ax[0]) 
+ax[0].legend(['Roll', 'Pitch', 'Yaw'])
+
+ax[1].set_title('Angular Velocity:')
+ax[1].set_ylabel('angle velocity\n[rad/s2]')
+mpc_plot.add_line('_x', 'D_angle', ax[1])
+ax[1].legend(['Roll Rate', 'Pitch Rate', 'Yaw Rate'])
+
+ax[2].set_title('Inputs')
+ax[2].set_ylabel('inputs')
+mpc_plot.add_line('_u', 'inp', ax[2])
+ax[2].legend(['input 1', 'input 2', 'input 3'])
+
+
+fig.tight_layout()
 plt.ion()
+
+
 
 """
 Run MPC main loop:
 """
 
-for k in range(150):
+for k in range(100):
     u0 = mpc.make_step(x0)
     y_next = simulator.make_step(u0)
     x0 = estimator.make_step(y_next)
     
 
-
     if show_animation:
-        graphics.plot_results(t_ind=k)
-        graphics.plot_predictions(t_ind=k)
-        graphics.reset_axes()
+        mpc_plot.plot_results()
+        mpc_plot.plot_predictions()
+        mpc_plot.reset_axes()
         plt.show()
         plt.pause(0.01)
+
+
 
 input('Press any key to exit.')
 

@@ -57,36 +57,22 @@ def template_mpc(model):
     lterm = model.aux['cost']
 
     mpc.set_objective(mterm=mterm, lterm=lterm)
-    mpc.set_rterm(inp1=1.0,inp2=1.0,inp3=1.0)
+    mpc.set_rterm(inp=np.array([[0.5], [0.5], [0.5]]))
 
+    max_x = np.array([[np.pi/2], [np.pi/2], [np.pi/2]])
+    max_u = np.array([[0.5], [0.5], [0.5]])
 
-    mpc.bounds['lower', '_x', 'Theta'] = -np.pi/2
-    mpc.bounds['lower', '_x', 'q_rate'] = -np.pi/2
+    # lower and upper bounds of the states
+    mpc.bounds['lower','_x','angle'] = -max_x
+    mpc.bounds['upper','_x','angle'] = max_x
+     # lower and upper bounds of the states
+    mpc.bounds['lower','_x','D_angle'] = -max_x
+    mpc.bounds['upper','_x','D_angle'] = max_x   
 
-    mpc.bounds['upper', '_x','Theta'] = np.pi/2
-    mpc.bounds['upper', '_x','q_rate'] = np.pi/2
-
-    mpc.bounds['lower', '_x', 'Roll'] = -np.pi/2
-    mpc.bounds['lower', '_x', 'p_rate'] = -np.pi/2
-
-    mpc.bounds['upper', '_x','Roll'] = np.pi/2
-    mpc.bounds['upper', '_x','p_rate'] = np.pi/2
-
-    mpc.bounds['lower', '_x', 'Yaw'] = -np.pi/2
-    mpc.bounds['lower', '_x', 'r_rate'] = -np.pi/2
-
-    mpc.bounds['upper', '_x','Yaw'] = np.pi/2
-    mpc.bounds['upper', '_x','r_rate'] = np.pi/2
-
-    mpc.bounds['lower','_u','inp1'] = -1
-    mpc.bounds['upper','_u','inp1'] = 1
-
-    mpc.bounds['lower','_u','inp2'] = -1
-    mpc.bounds['upper','_u','inp2'] = 1
-
-    mpc.bounds['lower','_u','inp3'] = -1
-    mpc.bounds['upper','_u','inp3'] = 1
-
+    # lower bounds of the input
+    mpc.bounds['lower','_u','inp'] = -max_u
+    # upper bounds of the input
+    mpc.bounds['upper','_u','inp'] =  max_u
     
     Iyy_values = np.array([1e-3])
     Ixx_values = np.array([1e-3])

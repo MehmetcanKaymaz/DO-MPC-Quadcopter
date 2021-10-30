@@ -28,7 +28,6 @@ import sys
 sys.path.append('../../')
 import do_mpc
 
-
 def template_model(symvar_type='SX'):
     """
     --------------------------------------------------------------------------
@@ -38,39 +37,33 @@ def template_model(symvar_type='SX'):
     model_type = 'continuous' # either 'discrete' or 'continuous'
     model = do_mpc.model.Model(model_type, symvar_type)
 
-
-    # States struct (optimization variables):
-    Theta = model.set_variable('_x',  'Theta')  # bio mass
-    q_rate = model.set_variable('_x',  'q_rate')  # Substrate
-    Roll = model.set_variable('_x',  'Roll')
-    p_rate = model.set_variable('_x',  'p_rate')
-    Yaw = model.set_variable('_x',  'Yaw')
-    r_rate = model.set_variable('_x',  'r_rate')
-
-    #theta_target=model.set_variable('_x','Theta-target')
-    # Input struct (optimization variables):
-    inp1 = model.set_variable('_u',  'inp1')
-    inp2 = model.set_variable('_u',  'inp2')
-    inp3 = model.set_variable('_u',  'inp3')
-
-    # Fixed parameters:
-    Iyy = model.set_variable('_p',  'Iyy')
-    Ixx = model.set_variable('_p',  'Ixx')
-    Izz = model.set_variable('_p',  'Izz')
-    #theta_target=model.set_variable('_p','Thetatarget')
+    # States struct (optimization variables): roll, pitch, yaw
+    angle    = model.set_variable(var_type='_x', var_name='angle', shape=(3,1)) # roll, pitch and yaw 
+    D_angle  = model.set_variable(var_type='_x', var_name='D_angle', shape=(3,1)) # first derivation of roll, pitch and yaw angle
+    #DD_angle = model.set_variable(var_type='_x', var_name='DD_angle', shape=(3,1)) # second derivation of roll, pitch and yaw angle
     
-    cost=pow(np.pi/4-Theta,2)+pow(np.pi/8-Roll,2)+pow(-np.pi/8-Yaw,2)
+    # Input struct (optimization variables):
+    inp = model.set_variable(var_type='_u', var_name='inp', shape=(3,1)) # u1, u2, u3
+   
+    # uncertain parameters:
+    Ixx = model.set_variable('_p',  'Ixx')
+    Iyy = model.set_variable('_p',  'Iyy')
+    Izz = model.set_variable('_p',  'Izz')
 
-    model.set_expression('cost', cost)
-    #model.set_expression('Theta-current', Theta)
+    DD_angle_next = vertcat( 
+                            inp[0]/Ixx ,  
+                            inp[1]/Iyy , 
+                            inp[2]/Izz 
+    ) 
 
     # Differential equations
-    model.set_rhs('Theta', q_rate)
-    model.set_rhs('q_rate', inp1/Iyy)
-    model.set_rhs('Roll', p_rate)
-    model.set_rhs('p_rate', inp2/Ixx)
-    model.set_rhs('Yaw', r_rate)
-    model.set_rhs('r_rate', inp3/Izz)   
+    model.set_rhs('angle', D_angle)
+    model.set_rhs('D_angle', DD_angle_next)
+    
+    # Cost
+    cost=pow(np.pi/4-angle[0],2)+pow(np.pi/8-angle[1],2)+pow(-np.pi/8-angle[2],2)
+
+    model.set_expression('cost', cost)
 
     # Build the model
     model.setup()
