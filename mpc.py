@@ -60,6 +60,7 @@ def template_mpc(model):
     mpc.set_rterm(inp=np.array([[0.5], [0.5], [0.5],[1.5]]))
 
     max_att = np.array([[np.pi/3], [np.pi/3], [np.pi]])
+    min_att = np.array([[np.pi/3], [np.pi/3], [0*np.pi]])
     max_rate = np.array([[np.pi], [np.pi], [np.pi]])
     max_u = np.array([[0.5], [0.5], [0.5],[2*0.5*9.81]])
     min_u = np.array([[0.5], [0.5], [0.5],[0.0]])

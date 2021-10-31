@@ -28,6 +28,7 @@ import sys
 sys.path.append('../../')
 import do_mpc
 
+
 def template_model(symvar_type='SX'):
     """
     --------------------------------------------------------------------------
@@ -103,11 +104,25 @@ def template_model(symvar_type='SX'):
     model.set_rhs('Velocity', Velocity_dot)
 
     ref_pose=[5,5,5]
-    target_pose=np.array(ref_pose)
+    """
+    current_pose=[Pose[0],Pose[1],Pose[2]]
+
+    Err_pose=[ref_pose[0]-current_pose[0],ref_pose[1]-current_pose[1],ref_pose[2]-current_pose[2]]
+
+    Distance_err=np.sqrt(pow(Err_pose[0],2)+pow(Err_pose[1],2)+pow(Err_pose[2],2))
+
+    statu=if_else(Distance_err<1,True,False)
+
+    ref_pose=if_else(statu==True,[0,0,0],[5,5,5])"""
+
+    target_pose=ref_pose
 
     target_vel_body=[target_pose[0]-Pose[0],target_pose[1]-Pose[1],target_pose[2]-Pose[2]]
 
+    
+
     target_vel=[target_vel_body[0]*np.cos(Attitude[2])+target_vel_body[1]*np.sin(Attitude[2]),target_vel_body[1]*np.cos(Attitude[2])-target_vel_body[0]*np.sin(Attitude[2]),target_vel_body[2]]
+    
     
     
     # Cost
