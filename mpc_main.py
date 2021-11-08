@@ -36,10 +36,10 @@ import time
 import argparse
 #from model import template_model
 from mpc import template_mpc
-from sim import template_simulator
+from mpc_sim import template_simulator
 
 parser = argparse.ArgumentParser(description='MPC')
-parser.add_argument('--ref', default="4.0,4.0,4.0,0.5" , type=str,
+parser.add_argument('--ref', default="4.0,4.0,4.0,0.5,10" , type=str,
                     help='target pose')
 parser.add_argument('--idx', default=0 , type=int,
                     help='index')

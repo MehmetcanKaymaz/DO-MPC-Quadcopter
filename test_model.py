@@ -10,7 +10,7 @@ controller=Controller()
 
 x0=quad.x
 
-T=5.0
+T=1.0
 dt=1e-2
 N=int(T/dt)
 t=np.linspace(0,T,N)
@@ -18,7 +18,7 @@ t=np.linspace(0,T,N)
 xd=5*np.ones(N)
 yd=3*np.ones(N)
 zd=2*np.ones(N)
-psid=(np.pi/4)*np.ones(N)
+psid=(np.pi/4)*np.ones(N)/np.pi
 V_max=5
 
 state_arr=np.zeros((N,12))

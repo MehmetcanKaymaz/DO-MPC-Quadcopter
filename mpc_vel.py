@@ -90,10 +90,9 @@ def template_model(symvar_type='SX'):
 
     # States struct (optimization variables): roll, pitch, yaw
     Velocity= model.set_variable(var_type='_x', var_name='Velocity', shape=(3,1))
-    Attitude    = model.set_variable(var_type='_x', var_name='Attitude', shape=(3,1)) # roll, pitch and yaw 
-    Rate  = model.set_variable(var_type='_x', var_name='Rate', shape=(3,1)) # first derivation of roll, pitch and yaw angle
-    #DD_angle = model.set_variable(var_type='_x', var_name='DD_angle', shape=(3,1)) # second derivation of roll, pitch and yaw angle
-    
+    Attitude= model.set_variable(var_type='_x', var_name='Attitude', shape=(3,1)) # roll, pitch and yaw 
+    Rate= model.set_variable(var_type='_x', var_name='Rate', shape=(3,1)) # first derivation of roll, pitch and yaw angle
+
     # Input struct (optimization variables):
     inp = model.set_variable(var_type='_u', var_name='inp', shape=(4,1)) # u1, u2, u3
    
@@ -124,9 +123,8 @@ def template_model(symvar_type='SX'):
     model.set_rhs('Attitude', Attitude_dot)
     model.set_rhs('Rate', Rate_dot)
     model.set_rhs('Velocity', Velocity_dot)
-    target_vel=ref_vel
 
-    cost=.1*pow(1*target_vel[0]-Velocity[0],2)+.1*pow(1*target_vel[1]-Velocity[1],2)+.1*pow(1*target_vel[2]-Velocity[2],2)+5*pow(target_vel[3]*np.pi-Attitude[2],2)
+    cost=.1*pow(1*ref_vel[0]-Velocity[0],2)+.1*pow(1*ref_vel[1]-Velocity[1],2)+.1*pow(1*ref_vel[2]-Velocity[2],2)+5*pow(ref_vel[3]-Attitude[2],2)
 
     model.set_expression('cost', cost)
 
@@ -136,7 +134,7 @@ def template_model(symvar_type='SX'):
     return model
 
 """ User settings: """
-show_animation = False
+show_animation = True
 store_results = False
 
 """

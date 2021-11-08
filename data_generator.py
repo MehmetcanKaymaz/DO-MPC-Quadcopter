@@ -2,11 +2,11 @@ import numpy as np
 import random
 import os
 
-epoch=5000
+epoch=1
 velx_lim=[-10,10]
 vely_lim=[-10,10]
 velz_lim=[-5,5]
-errpsi_lim=[-1,1]
+errpsi_lim=[-np.pi,np.pi]
 
 index=0
 
@@ -25,7 +25,7 @@ def arr_to_str(arr):
 
 
 for i in range(epoch):
-    command="python mpc_vel.py --ref {} --idx {} --episode {}".format(arr_to_str(calculate_random()),index,episode)
+    command="python mpc_vel.py --ref={} --idx {} --episode {}".format(arr_to_str(calculate_random()),index,episode)
     print(command)
     os.system(command)
     index+=1
