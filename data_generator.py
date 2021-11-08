@@ -2,35 +2,32 @@ import numpy as np
 import random
 import os
 
-epoch=2000
-errx_lim=[0,15]
-erry_lim=[-10,10]
-errz_lim=[-5,5]
-errpsi_lim=[-np.pi,np.pi]
-
-v_lim=[1,30]
+epoch=5000
+velx_lim=[-10,10]
+vely_lim=[-10,10]
+velz_lim=[-5,5]
+errpsi_lim=[-1,1]
 
 index=0
 
 episode=1000
 
 def calculate_random():
-    x=random.uniform(errx_lim[0],errx_lim[1])
-    y=random.uniform(erry_lim[0],erry_lim[1])
-    z=random.uniform(errz_lim[0],errz_lim[1])
+    x=random.uniform(velx_lim[0],velx_lim[1])
+    y=random.uniform(vely_lim[0],vely_lim[1])
+    z=random.uniform(velz_lim[0],velz_lim[1])
     psi=random.uniform(errpsi_lim[0],errpsi_lim[1])
-    v=random.uniform(v_lim[0],v_lim[1])
-    return [x,y,z,psi,v]
+    return [x,y,z,psi]
 
 def arr_to_str(arr):
-    s_cmd="{},{},{},{},{}".format(arr[0],arr[1],arr[2],arr[3],arr[4])
+    s_cmd="{},{},{},{}".format(arr[0],arr[1],arr[2],arr[3])
     return s_cmd
 
 
 for i in range(epoch):
-    command="python main.py --ref {} --idx {} --episode {}".format(arr_to_str(calculate_random()),index,episode)
+    command="python mpc_vel.py --ref {} --idx {} --episode {}".format(arr_to_str(calculate_random()),index,episode)
+    print(command)
     os.system(command)
     index+=1
-    print("*\n"*100)
 
 
