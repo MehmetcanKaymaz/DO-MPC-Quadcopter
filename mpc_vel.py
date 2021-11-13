@@ -72,8 +72,9 @@ def states_to_nn(xd,x,u):
     inputs.append(xd[3]-x[5][0])
     for i in range(3):
         inputs.append(x[i+6][0])
-    for i in range(4):
-        inputs.append(u[i][0])
+    for i in range(3):
+        inputs.append(u[i][0]*10+5)
+    inputs.append(u[3][0])
     return inputs    
 
 def norm_3d(vec):
@@ -124,7 +125,7 @@ def template_model(symvar_type='SX'):
     model.set_rhs('Rate', Rate_dot)
     model.set_rhs('Velocity', Velocity_dot)
 
-    cost=.1*pow(1*ref_vel[0]-Velocity[0],2)+.1*pow(1*ref_vel[1]-Velocity[1],2)+.1*pow(1*ref_vel[2]-Velocity[2],2)+5*pow(ref_vel[3]-Attitude[2],2)
+    cost=.5*pow(1*ref_vel[0]-Velocity[0],2)+.5*pow(1*ref_vel[1]-Velocity[1],2)+.7*pow(1*ref_vel[2]-Velocity[2],2)+5*pow(ref_vel[3]-Attitude[2],2)
 
     model.set_expression('cost', cost)
 
@@ -134,7 +135,7 @@ def template_model(symvar_type='SX'):
     return model
 
 """ User settings: """
-show_animation = True
+show_animation = False
 store_results = False
 
 """
@@ -219,7 +220,7 @@ for k in range(episode):
         plt.pause(0.01)
 
 nn_list=nn_list[0:index,:]
-np.savetxt("Datas3/data"+str(file_idx)+".txt",nn_list)
+np.savetxt("Datas/data"+str(file_idx)+".txt",nn_list)
 
 
 # Store results:

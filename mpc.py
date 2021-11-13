@@ -61,7 +61,7 @@ def template_mpc(model):
 
     max_att = np.array([[np.pi/3], [np.pi/3], [np.pi]])
     max_rate = np.array([[np.pi], [np.pi], [np.pi]])
-    max_u = np.array([[0.5], [0.5], [0.5],[2*0.5*9.81]])
+    max_u = np.array([[0.5], [0.5], [0.5],[10.0]])
     min_u = np.array([[0.5], [0.5], [0.5],[0.0]])
     max_vel=np.array([[15], [15], [15]])
 

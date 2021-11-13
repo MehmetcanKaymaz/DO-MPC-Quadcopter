@@ -126,7 +126,7 @@ def template_model(symvar_type='SX'):
     
     
     # Cost
-    cost=.1*pow(3*target_vel[0]-Velocity[0],2)+.1*pow(3*target_vel[1]-Velocity[1],2)+.1*pow(3*target_vel[2]-Velocity[2],2)+5*pow(1*np.pi/2-Attitude[2],2)
+    cost=.5*pow(3*target_vel[0]-Velocity[0],2)+.5*pow(3*target_vel[1]-Velocity[1],2)+.7*pow(3*target_vel[2]-Velocity[2],2)+5*pow(1*np.pi/2-Attitude[2],2)
 
     model.set_expression('cost', cost)
 

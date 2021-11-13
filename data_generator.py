@@ -1,11 +1,13 @@
 import numpy as np 
 import random
 import os
+import multiprocessing as mp
+import time
 
-epoch=1
-velx_lim=[-10,10]
-vely_lim=[-10,10]
-velz_lim=[-5,5]
+epoch=100
+velx_lim=[-15,15]
+vely_lim=[-3,3]
+velz_lim=[-2,2]
 errpsi_lim=[-np.pi,np.pi]
 
 index=0
@@ -23,11 +25,26 @@ def arr_to_str(arr):
     s_cmd="{},{},{},{}".format(arr[0],arr[1],arr[2],arr[3])
     return s_cmd
 
-
-for i in range(epoch):
+def run_code(index):
     command="python mpc_vel.py --ref={} --idx {} --episode {}".format(arr_to_str(calculate_random()),index,episode)
-    print(command)
     os.system(command)
-    index+=1
+
+
+if __name__=="__main__":
+    ti=time.time()
+    for i in range(epoch):
+        proceses=[]
+        for j in range(8):
+            proc=mp.Process(target=run_code,args=(index,))
+            proceses.append(proc)
+            proc.start()
+            index+=1
+        for proc in proceses:
+            proc.join()
+    tf=time.time()
+    print("delta time:{}".format(tf-ti))
+
+        
+
 
 
