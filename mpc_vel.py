@@ -1,25 +1,3 @@
-#
-#   This file is part of do-mpc
-#
-#   do-mpc: An environment for the easy, modular and efficient implementation of
-#        robust nonlinear model predictive control
-#
-#   Copyright (c) 2014-2019 Sergio Lucia, Alexandru Tatulea-Codrean
-#                        TU Dortmund. All rights reserved
-#
-#   do-mpc is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU Lesser General Public License as
-#   published by the Free Software Foundation, either version 3
-#   of the License, or (at your option) any later version.
-#
-#   do-mpc is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU Lesser General Public License for more details.
-#
-#   You should have received a copy of the GNU General Public License
-#   along with do-mpc.  If not, see <http://www.gnu.org/licenses/>.
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
@@ -150,7 +128,7 @@ estimator = do_mpc.estimator.StateFeedback(model)
 """
 Set initial state
 """
-x0 = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0]).reshape(-1,1) # roll, pitch, yaw and its derivatives
+x0 = np.array([-2, 1, 0, np.pi/4, 0, np.pi, 0, 0, 0]).reshape(-1,1) # roll, pitch, yaw and its derivatives
 mpc.x0 = x0
 simulator.x0 = x0
 estimator.x0 = x0
@@ -220,9 +198,9 @@ for k in range(episode):
         plt.pause(0.01)
 
 nn_list=nn_list[0:index,:]
-np.savetxt("Datas/data"+str(file_idx)+".txt",nn_list)
+np.savetxt("Datas2/data"+str(file_idx)+".txt",nn_list)
 
-
+#input("Press enter to quit")
 # Store results:
 if store_results:
     do_mpc.data.save_results([mpc, simulator], 'batch_reactor_MPC')

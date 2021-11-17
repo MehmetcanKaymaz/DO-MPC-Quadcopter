@@ -15,7 +15,7 @@ dt=1e-2
 N=int(T/dt)
 t=np.linspace(0,T,N)
 
-
+"""
 xd=5*np.ones(N)
 yd=1*np.ones(N)
 zd=.5*np.ones(N)
@@ -24,18 +24,22 @@ psid=(np.pi/4)*np.ones(N)/np.pi
 state_arr=np.zeros((N,9))
 
 
-""""""
-data_arr=np.loadtxt("Datas/data750.txt")
+"""
+data_arr=np.loadtxt("Datas/data780.txt")
 inputs=data_arr[:,0:9]
 outputs=data_arr[:,9:13]
 N=len(inputs[:,0])
 u_list=np.zeros((N,4))
 t=np.linspace(0,int(N/100),N)
-
+mse_arr=np.zeros(N)
 for i in range(N):
     u=controller.run_controller_nn(inputs[i,:])
     #u_list[i,:]=u_arr[i]
     u_list[i,:]=u
+    u_err=0
+    for j in range(4):
+        u_err+=np.sqrt(pow(outputs[i,j]-u[j],2))
+    mse_arr[i]=u_err
     """next_x=quad.run_model(u_list[i,:])
     state_arr[i,:]=x0[3:12]
     x0=next_x"""
@@ -69,32 +73,31 @@ plt.legend(["psi_real psi_desered"])
 plt.show()
 
 """
-plt.plot(t,u_list[:,0])
-plt.plot(t,outputs[:,0])
-plt.xlabel("time(s)")
-plt.ylabel("u1(m)")
-plt.legend(["u_real"," u_desered"])
-plt.show()
 
-plt.plot(t,u_list[:,1])
-plt.plot(t,outputs[:,1])
-plt.xlabel("time(s)")
-plt.ylabel("u2(m)")
-plt.legend(["u_real"," u_desered"])
-plt.show()
+fig, axs = plt.subplots(3, 2)
+axs[0,0].plot(t,u_list[:,0])
+axs[0,0].plot(t,outputs[:,0])
+axs[0,0].legend(["u_real"," u_desered"])
+axs[0,0].set_title("U1")
 
-plt.plot(t,u_list[:,2])
-plt.plot(t,outputs[:,2])
-plt.xlabel("time(s)")
-plt.ylabel("u3(m)")
-plt.legend(["u_real"," u_desered"])
-plt.show()
+axs[0,1].plot(t,u_list[:,1])
+axs[0,1].plot(t,outputs[:,1])
+axs[0,1].legend(["u_real"," u_desered"])
+axs[0,1].set_title("U2")
 
-plt.plot(t,u_list[:,3])
-plt.plot(t,outputs[:,3])
-plt.xlabel("time(s)")
-plt.ylabel("u4(rad)")
-plt.legend(["u_real"," u_desered"])
+axs[1,0].plot(t,u_list[:,2])
+axs[1,0].plot(t,outputs[:,2])
+axs[1,0].legend(["u_real"," u_desered"])
+axs[1,0].set_title("U3")
+
+axs[1,1].plot(t,u_list[:,3])
+axs[1,1].plot(t,outputs[:,3])
+axs[1,1].legend(["u_real"," u_desered"])
+axs[1,1].set_title("U4")
+
+axs[2,1].plot(t,mse_arr)
+axs[2,1].legend(["mse"])
+axs[2,1].set_title("mean square error")
 plt.show()
 
 

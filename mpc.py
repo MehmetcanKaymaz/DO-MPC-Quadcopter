@@ -57,7 +57,7 @@ def template_mpc(model):
     lterm = model.aux['cost']
 
     mpc.set_objective(mterm=mterm, lterm=lterm)
-    mpc.set_rterm(inp=np.array([[0.5], [0.5], [0.5],[1.5]]))
+    mpc.set_rterm(inp=np.array([[0.5], [0.5], [0.5],[.0]]))
 
     max_att = np.array([[np.pi/3], [np.pi/3], [np.pi]])
     max_rate = np.array([[np.pi], [np.pi], [np.pi]])

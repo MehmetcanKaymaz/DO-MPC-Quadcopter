@@ -8,22 +8,25 @@ class Controller:
         self.x=np.zeros(9)
         self.x_t=np.zeros(4)
         self.x_nn=np.zeros(9)
+        
         self.net=torch.nn.Sequential(
-            torch.nn.Linear(9, 32),
-            torch.nn.ReLU(),
-            torch.nn.Linear(32, 64),
-            torch.nn.ReLU(),
-            torch.nn.Linear(64, 128),
-            torch.nn.ReLU(),
-            torch.nn.Linear(128, 128),
-            torch.nn.ReLU(),
-            torch.nn.Linear(128, 64),
-            torch.nn.ReLU(),
-            torch.nn.Linear(64, 32),
-            torch.nn.ReLU(),
-            torch.nn.Linear(32, 4),
+        torch.nn.Linear(9, 32),
+        torch.nn.ReLU(),
+        torch.nn.Linear(32, 64),
+        torch.nn.ReLU(),
+        torch.nn.Linear(64, 128),
+        torch.nn.ReLU(),
+        torch.nn.Linear(128, 256),
+        torch.nn.ReLU(),
+        torch.nn.Linear(256, 128),
+        torch.nn.ReLU(),
+        torch.nn.Linear(128, 64),
+        torch.nn.ReLU(),
+        torch.nn.Linear(64, 32),
+        torch.nn.ReLU(),
+        torch.nn.Linear(32, 4),
     )
-        self.net.load_state_dict(torch.load("Models/checkpoint_vel_1000.pth"))
+        self.net.load_state_dict(torch.load("Models/checkpoint_vel_final_1000_1000.pth"))
         self.net.eval()  
 
     def __conf_inputs(self):
@@ -39,7 +42,7 @@ class Controller:
 
     
     def __run_nn(self):
-        self.u=self.net(torch.from_numpy(np.array(self.x_nn,np.float32))).cpu().detach().numpy()
+        self.u=self.net(torch.from_numpy(np.array(self.x_nn,np.float32))).cpu().detach().numpy()#.unsqueeze(0)
         return self.u
 
     def __calculate_u(self,u):
@@ -53,13 +56,12 @@ class Controller:
         self.x_t=x_t
         self.__conf_inputs()
         self.u=self.__run_nn()
-        self.u=self.__calculate_u(self.u)
+        #self.u=self.__calculate_u(self.u)
         
         return self.u
 
     def run_controller_nn(self,x):
         self.x_nn=x
-        print(self.x_nn)
         self.u=self.__run_nn()
 
         return self.u

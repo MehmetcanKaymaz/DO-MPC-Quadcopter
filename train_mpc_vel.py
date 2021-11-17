@@ -9,7 +9,7 @@ import argparse
 #System Check
 #print(torch.cuda.is_available)
 parser = argparse.ArgumentParser(description='MPC')
-parser.add_argument('--batch_size', default=64, type=int,
+parser.add_argument('--batch_size', default=32, type=int,
                     help='batch size')
 parser.add_argument('--learning_rate', default=0.0001 , type=float,
                     help='learning rate')
@@ -56,7 +56,7 @@ index=args.index
 torch.manual_seed(1)    # reproducible
 
 #print("Loading datas ...")
-matrix = np.loadtxt("Datas/all_data_vel_n.txt", dtype=np.float32)  #veriyi float32 cinsinden matrix degisenine aktariyor.
+matrix = np.loadtxt("Datas2/all_data.txt", dtype=np.float32)  #veriyi float32 cinsinden matrix degisenine aktariyor.
 
 matrix = torch.from_numpy(matrix)
 train_size = int(.9 * len(matrix))
@@ -78,7 +78,9 @@ net = torch.nn.Sequential(
         torch.nn.ReLU(),
         torch.nn.Linear(64, 128),
         torch.nn.ReLU(),
-        torch.nn.Linear(128, 128),
+        torch.nn.Linear(128, 256),
+        torch.nn.ReLU(),
+        torch.nn.Linear(256, 128),
         torch.nn.ReLU(),
         torch.nn.Linear(128, 64),
         torch.nn.ReLU(),
@@ -124,7 +126,7 @@ epp_valid_loss=[]
 #print("Training ....")
 for epoch in range(epochs+1):
     if epoch%100==0:
-        torch.save(net.state_dict(), "Models/checkpoint_vel_{}_{}.pth".format(index,epoch))
+        torch.save(net.state_dict(), "Models/checkpoint_vel_final_{}_{}.pth".format(index,epoch))
         #print("checkpoint_{}_{} saved!".format(epoch))
 
 
@@ -157,6 +159,6 @@ for epoch in range(epochs+1):
     epp_valid_loss.append(mean_loss)
 
 
-np.savetxt('Loss/TrainLoss_vel_{}.txt'.format(index),epp_train_loss)
-np.savetxt('Loss/ValidLoss_vel_{}.txt'.format(index),epp_valid_loss)
+np.savetxt('Loss/TrainLoss_vel_final_{}.txt'.format(index),epp_train_loss)
+np.savetxt('Loss/ValidLoss_vel_final_{}.txt'.format(index),epp_valid_loss)
 

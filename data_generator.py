@@ -10,7 +10,7 @@ vely_lim=[-3,3]
 velz_lim=[-2,2]
 errpsi_lim=[-np.pi,np.pi]
 
-index=0
+index=4
 
 episode=1000
 
@@ -26,7 +26,7 @@ def arr_to_str(arr):
     return s_cmd
 
 def run_code(index):
-    command="python mpc_vel.py --ref={} --idx {} --episode {}".format(arr_to_str(calculate_random()),index,episode)
+    command="python dagger_data_gen.py --ref={} --idx {} --episode {}".format(arr_to_str(calculate_random()),index,episode)
     os.system(command)
 
 
@@ -34,7 +34,7 @@ if __name__=="__main__":
     ti=time.time()
     for i in range(epoch):
         proceses=[]
-        for j in range(8):
+        for j in range(4):
             proc=mp.Process(target=run_code,args=(index,))
             proceses.append(proc)
             proc.start()
