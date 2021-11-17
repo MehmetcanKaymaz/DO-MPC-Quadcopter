@@ -4,13 +4,13 @@ import os
 import multiprocessing as mp
 import time
 
-epoch=100
+epoch=25
 velx_lim=[-15,15]
 vely_lim=[-3,3]
 velz_lim=[-2,2]
 errpsi_lim=[-np.pi,np.pi]
 
-index=4
+index=0
 
 episode=1000
 

@@ -78,10 +78,12 @@ for i in range(N):
     if err>.5:
         Data_arr.append(to_dataset(x=controller.x_nn,u=u_mpc))       
         mse_arr[i]=err
+        x0=quad.run_model(conf_u(u_mpc))
     else:
+        x0=quad.run_model(conf_u(u_nn))
         mse_arr[i]=0
-    state_arr[i,:]=x0
-    x0=quad.run_model(conf_u(u_mpc))
+    state_arr[i,:]=x0[3:12]
+    
 
 np.savetxt("Datas_Dagger_1/data_{}.txt".format(file_idx),np.array(Data_arr))
 
