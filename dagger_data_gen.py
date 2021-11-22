@@ -6,7 +6,7 @@ from mpc_class import MPC_controller
 import argparse
 
 parser = argparse.ArgumentParser(description='MPC')
-parser.add_argument('--ref', default="4.0,1.0,1.0,0.5" , type=str,
+parser.add_argument('--ref', default="12.0,1.0,1.0,0.5" , type=str,
                     help='target vel')
 parser.add_argument('--idx', default=0 , type=int,
                     help='index')
@@ -27,6 +27,7 @@ for pose in ref_vel_arr:
 
 
 quad=Model()
+#quad2=Model()
 controller=Controller()
 mpc_controller=MPC_controller()
 
@@ -45,8 +46,9 @@ def conf_u(u):
     return u
 
 x0=quad.x
+#x02=quad2.x
 
-T=5
+T=2
 dt=1e-2
 N=int(T/dt)
 t=np.linspace(0,T,N)
@@ -57,16 +59,18 @@ zd=ref_vel[2]*np.ones(N)
 psid=ref_vel[3]*np.ones(N)
 
 state_arr=np.zeros((N,9))
+state_arr_mpc=np.zeros((N,9))
 u_list_nn=np.zeros((N,4))
 u_list_mpc=np.zeros((N,4))
 
 
 mse_arr=np.zeros(N)
-
+index=0
 Data_arr=[]
 for i in range(N):
     xt=[xd[i],yd[i],zd[i],psid[i]]
     x0=x0[3:12]
+    #x02=x02[3:12]
     u_nn=controller.run_controller(x=x0,x_t=xt)
     u_mpc=mpc_controller.run_controller(x=x0,x_t=xt)
     u_list_mpc[i,:]=u_mpc
@@ -75,18 +79,22 @@ for i in range(N):
     err=0
     for j in range(3):
         err+=np.sqrt(pow(u_nn[j]-u_mpc[j],2))
-    if err>.5:
+    if err>.3:
         Data_arr.append(to_dataset(x=controller.x_nn,u=u_mpc))       
         mse_arr[i]=err
         x0=quad.run_model(conf_u(u_mpc))
+        #x02=quad2.run_model(conf_u(u_mpc))
+        index+=1
     else:
         x0=quad.run_model(conf_u(u_nn))
+        #x02=quad2.run_model(conf_u(u_mpc))
         mse_arr[i]=0
     state_arr[i,:]=x0[3:12]
+    #state_arr_mpc[i,:]=x02[3:12]
     
 
 np.savetxt("Datas_Dagger_1/data_{}.txt".format(file_idx),np.array(Data_arr))
-
+#print("index={}".format(index))
 """
 fig, axs = plt.subplots(3, 2)
 axs[0,0].plot(t,u_list_nn[:,0])
@@ -117,19 +125,23 @@ plt.show()
 fig, axs = plt.subplots(2, 2)
 axs[0,0].plot(t,xd)
 axs[0,0].plot(t,state_arr[:,0])
-axs[0,0].legend(["x_t"," x"])
+axs[0,0].plot(t,state_arr_mpc[:,0])
+axs[0,0].legend(["x_t"," x_nn","x_mpc"])
 
 axs[0,1].plot(t,yd)
 axs[0,1].plot(t,state_arr[:,1])
-axs[0,1].legend(["y_t"," y"])
+axs[0,1].plot(t,state_arr_mpc[:,1])
+axs[0,1].legend(["y_t"," y_nn","y_mpc"])
 
 axs[1,0].plot(t,zd)
 axs[1,0].plot(t,state_arr[:,2])
-axs[1,0].legend(["zt"," z"])
+axs[1,0].plot(t,state_arr_mpc[:,2])
+axs[1,0].legend(["z_t"," y_nn","xy_mpc"])
 
 axs[1,1].plot(t,psid)
 axs[1,1].plot(t,state_arr[:,5])
-axs[1,1].legend(["psi_t"," psi"])
+axs[1,1].plot(t,state_arr_mpc[:,5])
+axs[1,1].legend(["psi_t"," psi_nn","psi_mpc"])
 
 
 plt.show()

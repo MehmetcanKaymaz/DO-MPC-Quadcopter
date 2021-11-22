@@ -26,7 +26,7 @@ class Controller:
         torch.nn.ReLU(),
         torch.nn.Linear(32, 4),
     )
-        self.net.load_state_dict(torch.load("Models/checkpoint_vel_final_1000_1000.pth"))
+        self.net.load_state_dict(torch.load("Models/checkpoint_vel_D2_1000_1000.pth"))
         self.net.eval()  
 
     def __conf_inputs(self):

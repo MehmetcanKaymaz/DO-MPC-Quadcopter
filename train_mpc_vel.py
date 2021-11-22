@@ -56,7 +56,7 @@ index=args.index
 torch.manual_seed(1)    # reproducible
 
 #print("Loading datas ...")
-matrix = np.loadtxt("Datas2/all_data.txt", dtype=np.float32)  #veriyi float32 cinsinden matrix degisenine aktariyor.
+matrix = np.loadtxt("Dagger-All-Data/Dagger_D0_D1_D2_s.txt", dtype=np.float32)  #veriyi float32 cinsinden matrix degisenine aktariyor.
 
 matrix = torch.from_numpy(matrix)
 train_size = int(.9 * len(matrix))
@@ -89,7 +89,7 @@ net = torch.nn.Sequential(
         torch.nn.Linear(32, output_size),
     )
 
-
+net.load_state_dict(torch.load("Models/checkpoint_vel_D1_1000_1000.pth"))
 net.to(device)
 
 
@@ -126,7 +126,7 @@ epp_valid_loss=[]
 #print("Training ....")
 for epoch in range(epochs+1):
     if epoch%100==0:
-        torch.save(net.state_dict(), "Models/checkpoint_vel_final_{}_{}.pth".format(index,epoch))
+        torch.save(net.state_dict(), "Models/checkpoint_vel_D2_{}_{}.pth".format(index,epoch))
         #print("checkpoint_{}_{} saved!".format(epoch))
 
 
@@ -159,6 +159,6 @@ for epoch in range(epochs+1):
     epp_valid_loss.append(mean_loss)
 
 
-np.savetxt('Loss/TrainLoss_vel_final_{}.txt'.format(index),epp_train_loss)
-np.savetxt('Loss/ValidLoss_vel_final_{}.txt'.format(index),epp_valid_loss)
+np.savetxt('Loss/TrainLoss_vel_D2_{}.txt'.format(index),epp_train_loss)
+np.savetxt('Loss/ValidLoss_vel_D2_{}.txt'.format(index),epp_valid_loss)
 
