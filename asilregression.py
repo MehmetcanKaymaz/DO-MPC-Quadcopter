@@ -5,6 +5,8 @@ import torch.utils.data as Data
 import numpy as np
 
 
+#asasqas
+
 torch.manual_seed(1)    # reproducible
 
 print("Loading datas ...")
